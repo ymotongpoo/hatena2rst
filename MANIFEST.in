@@ -1,0 +1,8 @@
+include README.rst
+include LICENSE
+include *.py
+recursive-include hatena2rst *.py
+recursive-include docs *.rst
+recursive-include docs *.html
+recursive-exclude docs/_build *.rst
+prune docs/_build/_sources

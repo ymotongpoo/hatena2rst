@@ -30,7 +30,6 @@ classifiers=[
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
     'Operating System :: OS Independent',
-    'Programming Language :: Python :: 2.4',
     'Programming Language :: Python :: 2.5',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
@@ -45,7 +44,7 @@ install_requires=[
 	'setuptools',
 	'lxml>=2.3',
 	]
-if sys.version_info[0:2] in [(2, 4), (2, 5), (2, 6)]:
+if sys.version_info[0:2] in [(2, 5), (2, 6)]:
     install_requires.append('argparse')
 
 setup(
@@ -57,10 +56,13 @@ setup(
     author_email="ymotongpoo at gmall.com",
     description=short_description,
     long_description=long_description,
+    install_requires=install_requires,
     packages=['hatena2rst'],
     package_data={},
-    install_requires=install_requires,
-    extras_require = dict(
+    entry_points=dict(
+        console_scripts=["hatena2rst = main:main"]
+        ),
+    extras_require=dict(
         test=[
             'pytest>=2.2',
             'coverage>=3.5',
