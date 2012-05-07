@@ -42,6 +42,25 @@ def parse_body(body):
     parse <body> tag
     """
     pass
+
+
+def convert_link(notation):
+    return notation
+
+
+def convert_list():
+    pass
+
+
+def convert_img():
+    pass
+
+
+def convert_super_pre():
+    """
+    convert super pre notation into code-block directive
+    """
+    pass
     
 
 if __name__ == '__main__':
