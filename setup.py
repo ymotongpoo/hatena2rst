@@ -70,6 +70,6 @@ setup(
             ]
         ),
     test_suite='test.suite',
-    test_require=['pytest']
+    test_requires=['pytest']
     )
 

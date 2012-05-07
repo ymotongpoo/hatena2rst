@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+# for Python 2.5
+from __future__ import with_statement
+
 # 3rd party module
 from lxml import etree
 
@@ -10,10 +13,6 @@ try:
     from cStringIO import StringIO
 except ImportError:
     from StringIO import StringIO
-
-# for Python 2.5
-if sys.version_info[0:2] == (2, 5):
-    from __future__ import with_statement
 
 codec = "utf-8"
 
