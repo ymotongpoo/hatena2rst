@@ -9,16 +9,20 @@ from lxml import etree
 # standard module
 import re
 import sys
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+
+if sys.version_info[0] == 2:
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
+else:
+    from io import StringIO
 
 codec = "utf-8"
 
 def main(filename):
     with open(filename, 'rb') as f:
-        data = StringIO(f.read())
+        data = StringIO(f.read().decode(codec))
         tree = etree.parse(data, etree.XMLParser())
         parse_hatena_xml(tree)
 
@@ -43,8 +47,26 @@ def parse_body(body):
     pass
 
 
+hyperlink_notation = re.compile(u"""
+\[(?P<url>https?://[\S]+?)
+(:title=(?P<title>.+))?
+\]
+""", re.VERBOSE)
+
 def convert_link(notation):
-    return notation
+    """
+    convert hyperlink notation into external link directive
+    """
+    matched = hyperlink_notation.search(notation)
+    if matched:
+        found = matched.groupdict()
+        url = found.get('url', None)
+        title = found.get('title', None)
+    else:
+        url, title = None, None
+    
+    if url and title:
+        return u"`%s <%s>`_" % (title, url)
 
 
 def convert_list():

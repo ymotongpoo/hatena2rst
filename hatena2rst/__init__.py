@@ -2,5 +2,5 @@
 
 version = '0.0.1'
 
-from main import *
+from .main import *
 

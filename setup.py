@@ -25,7 +25,7 @@ version = '0.0.1'
 
 classifiers=[
     'Development Status :: 2 - Pre-Alpha',
-    'Environment :: Console'
+    'Environment :: Console',
     'Environment :: Web Environment',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
@@ -36,13 +36,13 @@ classifiers=[
     'Programming Language :: Python :: 3.1',
     'Programming Language :: Python :: 3.2',
     'Topic :: Software Development :: Libraries',
-	'Topic :: Text Processing :: Markup :: XML',
+    'Topic :: Text Processing :: Markup :: XML',
     'Topic :: Utilities',
     ]
 
 install_requires=[
-	'setuptools',
-	'lxml>=2.3',
+	'distribute',
+	'lxml>=2.3'
 	]
 if sys.version_info[0:2] in [(2, 5), (2, 6)]:
     install_requires.append('argparse')
@@ -59,17 +59,17 @@ setup(
     install_requires=install_requires,
     packages=['hatena2rst'],
     package_data={},
-    entry_points=dict(
-        console_scripts=["hatena2rst = main:main"]
-        ),
-    extras_require=dict(
+    #entry_points=dict(
+    #    console_scripts=["hatena2rst = main:main"]
+    #    ),
+    extras_require = dict(
         test=[
             'pytest>=2.2',
             'coverage>=3.5',
             'mock>=0.8.0'
             ]
-        ),
-    test_suite='test.suite',
-    test_requires=['pytest']
+        )
+    #test_suite='test.suite',
+    #tests_require=['pytest']
     )
 
