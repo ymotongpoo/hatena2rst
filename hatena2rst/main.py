@@ -46,12 +46,7 @@ def parse_body(body):
     """
     pass
 
-
-hyperlink_notation = re.compile(u"""
-\[(?P<url>https?://[\S]+?)
-(:title=(?P<title>.+))?
-\]
-""", re.VERBOSE)
+hyperlink_notation = re.compile("\[(.+)\]")
 
 def convert_link(notation):
     """
@@ -59,14 +54,28 @@ def convert_link(notation):
     """
     matched = hyperlink_notation.search(notation)
     if matched:
-        found = matched.groupdict()
-        url = found.get('url', None)
-        title = found.get('title', None)
+        content = matched.group(1)
+        elements = content.split(":")
+        url = ":".join(elements[0:1])
+        bookmark = "bookmark" in elements[2:]
+        image = "image" in elements[2:]
+        title = False
+        for e in elements[2:]:
+            if e[:5] == "title":
+                if e[5] == "=" and len(e) > 6:
+                    title = e[6:]
+                else len(e) == 5:
+                    title = ""
+                break
     else:
-        url, title = None, None
+        url, title, bookmark, image = None, None, None, None
     
     if url and title:
-        return u"`%s <%s>`_" % (title, url)
+        return "`%s <%s>`_" % (title, url)
+    elif url and not title:
+        return "`%s`_" % (url,)
+    else:
+        return notation
 
 
 def convert_list():
