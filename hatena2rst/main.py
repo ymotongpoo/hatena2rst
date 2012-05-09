@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # for Python 2.5
-from __future__ import with_statement
+from __future__ import with_statement, print_function, unicode_literals
 
 # 3rd party module
 from lxml import etree

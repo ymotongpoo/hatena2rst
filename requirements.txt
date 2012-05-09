@@ -1,3 +1,4 @@
+distribute
 lxml>=2.3
 pytest>=2.2
 pytest-cov>=1.5
