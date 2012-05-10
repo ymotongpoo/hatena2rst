@@ -46,7 +46,14 @@ def parse_body(body):
     """
     pass
 
-hyperlink_notation = re.compile("\[(.+)\]")
+hyperlink_notation = re.compile("""
+\[
+(?P<url>(https?|ftp)://[\S].+?)
+(:title=?(?P<title>.+?))?
+(?P<bookmark>:bookmark)?
+(?P<image>:image)?
+\]
+""", re.VERBOSE)
 
 def convert_link(notation):
     """
@@ -54,19 +61,11 @@ def convert_link(notation):
     """
     matched = hyperlink_notation.search(notation)
     if matched:
-        content = matched.group(1)
-        elements = content.split(":")
-        url = ":".join(elements[0:1])
-        bookmark = "bookmark" in elements[2:]
-        image = "image" in elements[2:]
-        title = False
-        for e in elements[2:]:
-            if e[:5] == "title":
-                if e[5] == "=" and len(e) > 6:
-                    title = e[6:]
-                else len(e) == 5:
-                    title = ""
-                break
+        content = matched.groupdict()
+        url = content['url']
+        bookmark = content['bookmark']
+        image = content['image']
+        title = content['title']
     else:
         url, title, bookmark, image = None, None, None, None
     

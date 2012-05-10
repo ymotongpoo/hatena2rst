@@ -2,10 +2,7 @@
 
 import sys
 import os.path
-try:
-    from setuptools import setup, Command
-except ImportError:
-    from distutils.core import setup, Command
+from setuptools import setup, Command
 
 def read_file(name):
     path = os.path.join(os.path.dirname(__file__), name)
