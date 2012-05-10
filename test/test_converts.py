@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from hatena2rst import convert_link, convert_list
+from hatena2rst import convert_link, convert_list, convert_section
 
 """
 convert_link()
@@ -57,3 +57,24 @@ def test_level_2_link():
 def test_level_3_link():
     list = convert_list("---こんにちは")
     assert "      * こんにちは" == list
+
+
+"""
+convert_section()
+"""
+def test_section_normal():
+    section = convert_section("**section")
+    assert "section\n======="
+
+def test_section_multibyte():
+    section = convert_section("**節")
+    assert "節\n=="
+
+def test_subsection_normal():
+    section = convert_section("***subsection")
+    assert "subsection\n----------"
+
+def test_subsection_multibyte():
+    section = convert_section("***小節")
+    assert "小節\n----"
+

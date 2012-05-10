@@ -50,11 +50,21 @@ def parse_body(body):
 
 
 section_notation = re.compile("""
-\A\b*\*{2,3}\s*(?P<title>.+)?
+\A\s*(?P<notation>\*{2,3})\s*(?P<title>.*)
 """, re.VERBOSE)
 
-def convert_section(notation):
-    pass
+def convert_section(line):
+    matched = section_notation.search(line)
+    if matched:
+        content = matched.groupdict()
+        if content['notation'] == "**":
+            division = '='
+        else:
+            division = '-'
+        length = len(content['title'].encode(codec))
+        return "%s\n%s" % (content['title'], division * length)
+    else:
+        return line
     
 
 hyperlink_notation = re.compile("""
