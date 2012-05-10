@@ -34,6 +34,14 @@ def test_link_with_port():
     link = convert_link("[http://www.example.com:8080/?spam=egg&ham=spam]")
     assert "`http://www.example.com:8080/?spam=egg&ham=spam`_" == link
 
+def test_link_with_port_and_title():
+    link = convert_link("[http://www.example.com:8080/?spam=egg:title=ほげ]")
+    assert "`ほげ <http://www.example.com:8080/?spam=egg>`_" == link
+
+def test_link_in_sentence():
+    link = convert_link("詳しくは[http://spam.com:title=ここ]を見て下さい")
+    assert "詳しくは `ここ <http://spam.com>`_ を見て下さい" == link
+
 
 """
 convert_list()

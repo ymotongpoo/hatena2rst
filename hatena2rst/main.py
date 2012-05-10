@@ -83,12 +83,12 @@ def convert_link(line):
         title = content['title']
     
         if url and title:
-            converted = "`%s <%s>`_" % (title, url)
+            converted = " `%s <%s>`_ " % (title, url)
         elif url and not title:
-            converted = "`%s`_" % (url,)
+            converted = " `%s`_ " % (url,)
         target = target.replace(notation, converted)
 
-    return target
+    return target.strip()
 
 
 list_notation = re.compile("""
