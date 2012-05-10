@@ -9,6 +9,7 @@ from lxml import etree
 # standard module
 import re
 import sys
+import string
 
 if sys.version_info[0] == 2:
     try:
@@ -19,6 +20,7 @@ else:
     from io import StringIO
 
 codec = "utf-8"
+indent = "   "
 
 def main(filename):
     with open(filename, 'rb') as f:
@@ -47,10 +49,11 @@ def parse_body(body):
     pass
 
 
-chapter_notation = re.compile("""
-\A\*{1,3}
+section_notation = re.compile("""
+\A\b*\*{2,3}\s*(?P<title>.+)?
 """, re.VERBOSE)
-def convert_chapter(notation):
+
+def convert_section(notation):
     pass
     
 
@@ -63,35 +66,47 @@ hyperlink_notation = re.compile("""
 \]
 """, re.VERBOSE)
 
-def convert_link(notation):
+def convert_link(line):
     """
     convert hyperlink notation into external link directive
+
+    TODO: add procedure for image and bookmark
+    TODO: add function for getting title when no title specified
     """
-    matched = hyperlink_notation.search(notation)
-    if matched:
-        content = matched.groupdict()
+    target = line
+    for m in hyperlink_notation.finditer(line):
+        notation = m.group(0)
+        content = m.groupdict()
         url = content['url']
         bookmark = content['bookmark']
         image = content['image']
         title = content['title']
-    else:
-        url, title, bookmark, image = None, None, None, None
     
-    if url and title:
-        return "`%s <%s>`_" % (title, url)
-    elif url and not title:
-        return "`%s`_" % (url,)
-    else:
-        return notation
+        if url and title:
+            converted = "`%s <%s>`_" % (title, url)
+        elif url and not title:
+            converted = "`%s`_" % (url,)
+        target = target.replace(notation, converted)
+
+    return target
 
 
 list_notation = re.compile("""
-^(\s+)?\-{1,3}
+\A\s*(?P<depth>\-{1,3})(?P<content>.*)
 """, re.VERBOSE)
-def convert_list(notation):
-    
-    pass
 
+def convert_list(line):
+    matched = list_notation.search(line)
+    prefix = ""
+    if matched:
+        content = matched.groupdict()
+        print(content)
+        if content['depth']:
+            prefix = indent * ( len(content['depth']) - 1 ) + '*'
+        return "%s %s" % (prefix, content['content'])
+    else:
+        return line
+    
 
 def convert_img():
     pass

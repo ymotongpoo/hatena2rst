@@ -1,10 +1,7 @@
-.. hatena2rst documentation master file, created by
-   sphinx-quickstart on Mon May  7 00:52:10 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. -*- coding: utf-8 -*-
 
-Welcome to hatena2rst's documentation!
-======================================
+hatena2rst
+==========
 
 Contents:
 
@@ -12,11 +9,13 @@ Contents:
    :maxdepth: 2
 
 
+これはなにか
+------------
 
-Indices and tables
-==================
+名前のとおり、はてなダイアリーのアーカイブをreStructured Textに変換するツールです。
+大したことしてないしとりあえず自分の
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+はてな記法は `こちら`_ を参考にしています。
+
+.. _こちら: http://hatenadiary.g.hatena.ne.jp/keyword/%E3%81%AF%E3%81%A6%E3%81%AA%E8%A8%98%E6%B3%95%E4%B8%80%E8%A6%A7
 
