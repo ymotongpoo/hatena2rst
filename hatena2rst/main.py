@@ -46,6 +46,14 @@ def parse_body(body):
     """
     pass
 
+
+chapter_notation = re.compile("""
+\A\*{1,3}
+""", re.VERBOSE)
+def convert_chapter(notation):
+    pass
+    
+
 hyperlink_notation = re.compile("""
 \[
 (?P<url>(https?|ftp)://[\S].+?)
@@ -77,7 +85,11 @@ def convert_link(notation):
         return notation
 
 
-def convert_list():
+list_notation = re.compile("""
+^(\s+)?\-{1,3}
+""", re.VERBOSE)
+def convert_list(notation):
+    
     pass
 
 
@@ -90,6 +102,8 @@ def convert_super_pre():
     convert super pre notation into code-block directive
     """
     pass
+
+
     
 
 if __name__ == '__main__':
