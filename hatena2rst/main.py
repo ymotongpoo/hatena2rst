@@ -154,19 +154,52 @@ def convert_list(line):
     prefix = ""
     if matched:
         content = matched.groupdict()
-        print(content)
         if content['depth']:
             prefix = indent * ( len(content['depth']) - 1 ) + '*'
         return "%s %s" % (prefix, content['content'])
     else:
         return line
+
+
+id_notation = re.compile("""
+id:(?P<user>[\w\-]+)
+(:((?P<date>\d{8})|(?P<month>\d{6})|(?P<option>archive|about)))?
+((?P<separator>(:|\#))((?P<epoch>\d{9,10})|(?P<amonth>\d{6})))?
+""", re.VERBOSE)
+
+diary_url_tmpl = r"http://d.hatena.ne.jp/%s/"
+
+def convert_id(line):
+    separator_map = {"#": "#", 
+                     ":": "/"}
+    target = line
+    for m in id_notation.finditer(line):
+        notation = m.group(0)
+        content = m.groupdict()
+        converted = diary_url_tmpl % content['user']
+        if content['date']:
+            converted += "%s" % content['date']
+            if content['epoch']:
+                separator = separator_map[content['separator']]
+                converted += "%s%s" % (separator, content['epoch'])
+        elif content['month']:
+            converted += "%s" % content['month']
+        elif content['option']:
+            converted += "%s" % content['option']
+            if content['amonth'] and content['option'] == 'archive':
+                converted += "/%s" % content['amonth']
+        print((converted, notation))
+        converted = "`%s <%s>`_" % (notation, converted)
+        target = target.replace(notation, converted)
+
+    return target
     
 
 fotolife_notation = re.compile("""
-f:id:(?P<user>\w+):
-(?P<dt>\d{14}[a-z]):
-image
-(:(?P<option>[a-z0-9,]+))?
+\[f:id:(?P<user>[0-9a-zA-Z_\-]+?)
+(:(?P<dt>\d{14}[a-z]))?
+(?P<image>:image)?
+(:(?P<option>[a-z0-9,]+))?\]
 """, re.VERBOSE)
 
 image_url_tmpl = (r"http://f.hatena.ne.jp/images/fotolife/" +
@@ -186,6 +219,23 @@ def get_image_option(option_string):
         align=None,
         scale=None
         )
+    if option_string:
+        options = option_string.split(',')
+    else:
+        options = []
+    for o in options:
+        if re.search("\A(h|w)\d+", o):
+            if o[0] == "h":
+                option_dict['height'] = o[1:]
+            else:
+                option_dict['width'] = o[1:]
+        elif o in ['left', 'right']:
+            option_dict['align'] = o
+        elif o == 'small':
+            option_dict['scale'] = '20%'
+        elif o == 'medium':
+            option_dict['scale'] = '40%'
+
     return option_dict
 
 def convert_fotolife(line):
@@ -193,21 +243,30 @@ def convert_fotolife(line):
     for m in fotolife_notation.finditer(line):
         notation = m.group(0)
         content = m.groupdict()
-        option = get_image_option(content['option'])
-
-        """
-        TODO: Replace this image url generator with
-        Hatena fotolife API. Image urls are fetched
-        through GET request to EditURI.
-        http://developer.hatena.ne.jp/ja/documents/fotolife/apis/atom
-        """
-        content['date'] = content['dt'][:8]
-        content['initial'] = content['user'][0]
-        content['ext'] = 'png'
-        image_url = image_url_tmpl % content
         
-        converted = generate_image_directive(image_url, option)
-        target.replace(notation, converted)
+        if content['image']:
+            """
+            TODO: Replace this image url generator with
+            Hatena fotolife API. Image urls are fetched
+            through GET request to EditURI.
+            http://developer.hatena.ne.jp/ja/documents/fotolife/apis/atom
+            """
+            content['date'] = content['dt'][:8]
+            content['initial'] = content['user'][0]
+            content['ext'] = 'png'
+            image_url = image_url_tmpl % content
+            
+            option = get_image_option(content['option'])
+            converted = generate_image_directive(image_url, option)
+            target = target.replace(notation, converted)
+        else:
+            converted = r"http://f.hatena.ne.jp/" + content['user']
+            if content['dt']:
+                converted += "/" + content['dt'][:8] + "/" + content['dt']
+            converted = "`%s`_" % converted
+
+            target = target.replace(notation, converted)
+
     return target
 
 
@@ -217,8 +276,6 @@ def convert_super_pre():
     """
     pass
 
-
-    
 
 if __name__ == '__main__':
     from argparse import ArgumentParser

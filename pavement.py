@@ -48,7 +48,6 @@ def test_all():
     os.chdir(project_root)
     sh("tox")
 
-
 @task
 def clean():
     """Clean up previous garbage"""

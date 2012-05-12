@@ -104,6 +104,43 @@ def test_level_3_link():
     assert "      * こんにちは" == list
 
 
+"""
+convert_id()
+"""
+def test_id():
+    id = convert_id("id:ymotongpoo")
+    assert "`id:ymotongpoo <http://d.hatena.ne.jp/ymotongpoo/>`_" == id
+
+def test_date():
+    date = convert_id("id:ymotongpoo:20060401")
+    assert ("`id:ymotongpoo:20060401 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/20060401>`_") == date
+
+def test_page():
+    page = convert_id("id:ymotongpoo:20060401:1143899261")
+    assert ("`id:ymotongpoo:20060401:1143899261 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/20060401/1143899261>`_") == page
+
+def test_semipage():
+    page = convert_id("id:ymotongpoo:20060401#1143899261")
+    assert ("`id:ymotongpoo:20060401#1143899261 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/20060401#1143899261>`_") == page
+
+def test_archive():
+    archive = convert_id("id:ymotongpoo:archive")
+    assert ("`id:ymotongpoo:archive " +
+            "<http://d.hatena.ne.jp/ymotongpoo/archive>`_") == archive
+
+def test_archive_month():
+    archive = convert_id("id:ymotongpoo:archive:200604")
+    assert ("`id:ymotongpoo:archive:200604 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/archive/200604>`_") == archive
+
+def test_about():
+    about = convert_id("id:ymotongpoo:about")
+    assert ("`id:ymotongpoo:about " +
+            "<http://d.hatena.ne.jp/ymotongpoo/about>`_") == about
+
 
 """
 convert_fotolife() and related functions
@@ -127,3 +164,41 @@ def test_image_directive_with_options():
             "   :width: 60\n" +
             "   :align: left\n" +
             "   :height: 100\n") == directive
+
+
+def test_image_option():
+    option = 'w60,h100,right'
+    option_dict = get_image_option(option)
+    assert {'height': '100',
+            'width': '60',
+            'align': 'right',
+            'scale': None} == option_dict
+
+def test_image_option_2():
+    option = 'small,left,w40,h10000'
+    option_dict = get_image_option(option)
+    assert {'height': '10000',
+            'width': '40',
+            'align': 'left',
+            'scale': '20%'} == option_dict
+
+
+def test_fotolife_normal():
+    directive = convert_fotolife("[f:id:hatenadiary:20041007101545j:image]")
+    assert (".. image:: http://f.hatena.ne.jp/images/fotolife/h/" +
+            "hatenadiary/20041007/20041007101545j.png\n") == directive
+
+def test_fotolife_with_option():
+    directive = convert_fotolife("[f:id:hatenadiary:20041007101545j:image:w60,h100]")
+    assert (".. image:: http://f.hatena.ne.jp/images/fotolife/h/" +
+            "hatenadiary/20041007/20041007101545j.png\n" +
+            "   :width: 60\n" +
+            "   :height: 100\n") == directive
+
+def test_fotolife_simple_user_link():
+    link = convert_fotolife("[f:id:hatenadiary]")
+    assert "`http://f.hatena.ne.jp/hatenadiary`_" == link
+
+def test_fotolife_simple_pic_link():
+    link = convert_fotolife("[f:id:hatenadiary:20041007101545j]")
+    assert "`http://f.hatena.ne.jp/hatenadiary/20041007/20041007101545j`_" == link
