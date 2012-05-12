@@ -16,8 +16,13 @@ def test_chapter_multibyte():
     
 
 """
-convert_section()
+convert_section() and related functions
 """
+def test_string_width():
+    test_cases = ["hello", "こんにちは", "abcあいう"]
+    results = [string_width(x) for x in test_cases]
+    assert [5, 10, 9] == results
+
 def test_section_normal():
     section = convert_section("**section")
     assert "section\n======="
@@ -100,3 +105,25 @@ def test_level_3_link():
 
 
 
+"""
+convert_fotolife() and related functions
+"""
+def test_image_directive_no_options():
+    image_url = "http://torufurukawa.com/images/bucho.jpg"
+    option = {}
+    directive = generate_image_directive(image_url, option)
+    assert ".. image:: http://torufurukawa.com/images/bucho.jpg\n" == directive
+
+def test_image_directive_with_options():
+    image_url = "http://torufurukawa.com/images/bucho.jpg"
+    option = {
+        'width': '60',
+        'height': '100',
+        'align': 'left',
+        'scale': None
+        }
+    directive = generate_image_directive(image_url, option)
+    assert (".. image:: http://torufurukawa.com/images/bucho.jpg\n" +
+            "   :width: 60\n" +
+            "   :align: left\n" +
+            "   :height: 100\n") == directive

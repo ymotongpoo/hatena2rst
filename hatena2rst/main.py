@@ -24,6 +24,9 @@ codec = "utf-8"
 indent = "   "
 image_extensions = ['png', 'PNG, ''jpeg', 'JPEG', 'jpg', 'JPG', 'gif', 'GIF']
 
+"""
+main process
+"""
 def main(filename):
     with open(filename, 'rb') as f:
         data = StringIO(f.read().decode(codec))
@@ -50,7 +53,9 @@ def parse_body(body):
     """
     pass
 
-
+"""
+utility functions
+"""
 def string_width(string):
     """
     measure rendered string width.
@@ -169,7 +174,7 @@ image_url_tmpl = (r"http://f.hatena.ne.jp/images/fotolife/" +
 
 def generate_image_directive(image_url, option):
     directive = ".. image:: %s\n" % image_url
-    for k, v in option:
+    for k, v in option.items():
         if v:
             directive += "   :%s: %s\n" % (k, v)
     return directive
