@@ -1,7 +1,43 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals
-from hatena2rst import convert_link, convert_list, convert_section
+from hatena2rst import *
+
+"""
+convert_chapter()
+"""
+def test_chapter_normal():
+    chapter = convert_chapter("*1207008000*test")
+    assert "======\n test \n======" == chapter
+
+def test_chapter_multibyte():
+    chapter = convert_chapter("*1207008000*テストタイトル")
+    assert "================\n テストタイトル \n================" == chapter
+    
+
+"""
+convert_section()
+"""
+def test_section_normal():
+    section = convert_section("**section")
+    assert "section\n======="
+
+def test_section_multibyte():
+    section = convert_section("**節")
+    assert "節\n=="
+
+def test_subsection_normal():
+    section = convert_section("***subsection")
+    assert "subsection\n----------"
+
+def test_subsection_multibyte():
+    section = convert_section("***小節")
+    assert "小節\n----"
+
+def test_no_section():
+    nosection = convert_section("こんにちは")
+    assert "こんにちは" == nosection
+
 
 """
 convert_link()
@@ -42,6 +78,10 @@ def test_link_in_sentence():
     link = convert_link("詳しくは[http://spam.com:title=ここ]を見て下さい")
     assert "詳しくは `ここ <http://spam.com>`_ を見て下さい" == link
 
+def test_no_link():
+    nolink = convert_link("ふるかわとおる")
+    assert "ふるかわとおる" == nolink
+
 
 """
 convert_list()
@@ -59,22 +99,4 @@ def test_level_3_link():
     assert "      * こんにちは" == list
 
 
-"""
-convert_section()
-"""
-def test_section_normal():
-    section = convert_section("**section")
-    assert "section\n======="
-
-def test_section_multibyte():
-    section = convert_section("**節")
-    assert "節\n=="
-
-def test_subsection_normal():
-    section = convert_section("***subsection")
-    assert "subsection\n----------"
-
-def test_subsection_multibyte():
-    section = convert_section("***小節")
-    assert "小節\n----"
 
