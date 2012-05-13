@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# for Python 2.5
+# for Python 2.x
 from __future__ import with_statement, print_function, unicode_literals
 
 # 3rd party module
@@ -20,9 +20,8 @@ if sys.version_info[0] == 2:
 else:
     from io import StringIO
 
-codec = "utf-8"
-indent = "   "
-image_extensions = ['png', 'PNG, ''jpeg', 'JPEG', 'jpg', 'JPG', 'gif', 'GIF']
+from constants import codec, indent, image_extensions, filetype_map
+
 
 """
 main process
@@ -70,7 +69,37 @@ def string_width(string):
             width += 1
     return width
 
+"""
+convert multi-line notations
+  - quate notation (>>..<<)
+  - pre notation (>|..|<)
+  - super pre notation (>||..||<)
+"""
 
+# super pre notatino
+#  - http://goo.gl/Q2szA
+#  - http://goo.gl/xtQWf
+def convert_super_pre(depth, block, filetype):
+    """
+    convert super pre notation into code-block directive
+    """
+    indented_block = [ indent*depth + l for l in block ]
+    pass
+    
+
+
+"""
+convert in-line notations
+  - chapter/section notation (*, **, ***)
+  - hyperlink notation ([http://...])
+  - list notation (-..., +..., etc)
+  - id notation (id:user:20120512, etc)
+  - fotolive notation ([f:id:user:20120512094500:image], etc)
+"""
+
+# chapter notation
+#  - http://goo.gl/CDXtj
+#  - http://goo.gl/IkpfS
 chapter_notation = re.compile("""
 \A\s*\*(?P<epoch>[0-9]{9,10})\*\s*(?P<title>.*)
 """, re.VERBOSE)
@@ -89,7 +118,8 @@ def convert_chapter(line):
     else:
         return line
 
-
+# section notation
+#  - http://goo.gl/eZTQu
 section_notation = re.compile("""
 \A\s*(?P<notation>\*{2,3})\s*(?P<title>.*)
 """, re.VERBOSE)
@@ -107,7 +137,8 @@ def convert_section(line):
     else:
         return line
     
-
+# hyperlink notation
+#  - http://goo.gl/m8cS
 hyperlink_notation = re.compile("""
 \[
 (?P<url>(https?|ftp)://[\S].+?)
@@ -144,25 +175,31 @@ def convert_link(line):
 
     return target.strip()
 
-
+# list notation
+#  - http://goo.gl/UpXR7
 list_notation = re.compile("""
-\A\s*(?P<depth>\-{1,3})(?P<content>.*)
+\A(?P<depth>(\-{1,3}|\+{1,3}))(?P<content>.*)
 """, re.VERBOSE)
 
 def convert_list(line):
+    markup_map = {"-": "*", 
+                  "+": "#."}
     matched = list_notation.search(line)
     prefix = ""
     if matched:
         content = matched.groupdict()
         if content['depth']:
-            prefix = indent * ( len(content['depth']) - 1 ) + '*'
+            markup = markup_map[content['depth'][0]]
+            prefix = indent * ( len(content['depth']) - 1 ) + markup
         return "%s %s" % (prefix, content['content'])
     else:
         return line
 
-
+# id notation (diary notation)
+#  - http://goo.gl/5nlXD
+#  - http://goo.gl/uzUx7
 id_notation = re.compile("""
-id:(?P<user>[\w\-]+)
+(d:)?id:(?P<user>[\w\-]+)
 (:((?P<date>\d{8})|(?P<month>\d{6})|(?P<option>archive|about)))?
 ((?P<separator>(:|\#))((?P<epoch>\d{9,10})|(?P<amonth>\d{6})))?
 """, re.VERBOSE)
@@ -194,7 +231,8 @@ def convert_id(line):
 
     return target
     
-
+# fotolife notation
+#  - http://goo.gl/yxb8
 fotolife_notation = re.compile("""
 \[f:id:(?P<user>[0-9a-zA-Z_\-]+?)
 (:(?P<dt>\d{14}[a-z]))?
@@ -268,13 +306,6 @@ def convert_fotolife(line):
             target = target.replace(notation, converted)
 
     return target
-
-
-def convert_super_pre():
-    """
-    convert super pre notation into code-block directive
-    """
-    pass
 
 
 if __name__ == '__main__':

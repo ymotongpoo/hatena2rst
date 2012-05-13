@@ -95,13 +95,25 @@ def test_level_1_list():
     list = convert_list("-こんにちは")
     assert "* こんにちは" == list
 
-def test_level_2_link():
+def test_level_2_list():
     list = convert_list("--こんにちは")
     assert "   * こんにちは" == list
 
-def test_level_3_link():
+def test_level_3_list():
     list = convert_list("---こんにちは")
     assert "      * こんにちは" == list
+
+def test_level_1_numbered_list():
+    list = convert_list("+こんにちは")
+    assert "#. こんにちは"
+
+def test_level_2_numbered_list():
+    list = convert_list("++こんにちは")
+    assert "   #. こんにちは" == list
+
+def test_level_3_numbered_list():
+    list = convert_list("+++こんにちは")
+    assert "      #. こんにちは" == list
 
 
 """
@@ -111,9 +123,18 @@ def test_id():
     id = convert_id("id:ymotongpoo")
     assert "`id:ymotongpoo <http://d.hatena.ne.jp/ymotongpoo/>`_" == id
 
+def test_did():
+    id = convert_id("d:id:ymotongpoo")
+    assert "`d:id:ymotongpoo <http://d.hatena.ne.jp/ymotongpoo/>`_" == id
+
 def test_date():
     date = convert_id("id:ymotongpoo:20060401")
     assert ("`id:ymotongpoo:20060401 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/20060401>`_") == date
+
+def test_ddate():
+    date = convert_id("d:id:ymotongpoo:20060401")
+    assert ("`d:id:ymotongpoo:20060401 " +
             "<http://d.hatena.ne.jp/ymotongpoo/20060401>`_") == date
 
 def test_page():
@@ -121,9 +142,19 @@ def test_page():
     assert ("`id:ymotongpoo:20060401:1143899261 " +
             "<http://d.hatena.ne.jp/ymotongpoo/20060401/1143899261>`_") == page
 
+def test_dpage():
+    page = convert_id("d:id:ymotongpoo:20060401:1143899261")
+    assert ("`d:id:ymotongpoo:20060401:1143899261 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/20060401/1143899261>`_") == page
+
 def test_semipage():
     page = convert_id("id:ymotongpoo:20060401#1143899261")
     assert ("`id:ymotongpoo:20060401#1143899261 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/20060401#1143899261>`_") == page
+
+def test_dsemipage():
+    page = convert_id("d:id:ymotongpoo:20060401#1143899261")
+    assert ("`d:id:ymotongpoo:20060401#1143899261 " +
             "<http://d.hatena.ne.jp/ymotongpoo/20060401#1143899261>`_") == page
 
 def test_archive():
@@ -131,14 +162,29 @@ def test_archive():
     assert ("`id:ymotongpoo:archive " +
             "<http://d.hatena.ne.jp/ymotongpoo/archive>`_") == archive
 
+def test_darchive():
+    archive = convert_id("d:id:ymotongpoo:archive")
+    assert ("`d:id:ymotongpoo:archive " +
+            "<http://d.hatena.ne.jp/ymotongpoo/archive>`_") == archive
+
 def test_archive_month():
     archive = convert_id("id:ymotongpoo:archive:200604")
     assert ("`id:ymotongpoo:archive:200604 " +
             "<http://d.hatena.ne.jp/ymotongpoo/archive/200604>`_") == archive
 
+def test_darchive_month():
+    archive = convert_id("d:id:ymotongpoo:archive:200604")
+    assert ("`d:id:ymotongpoo:archive:200604 " +
+            "<http://d.hatena.ne.jp/ymotongpoo/archive/200604>`_") == archive
+
 def test_about():
     about = convert_id("id:ymotongpoo:about")
     assert ("`id:ymotongpoo:about " +
+            "<http://d.hatena.ne.jp/ymotongpoo/about>`_") == about
+
+def test_dabout():
+    about = convert_id("d:id:ymotongpoo:about")
+    assert ("`d:id:ymotongpoo:about " +
             "<http://d.hatena.ne.jp/ymotongpoo/about>`_") == about
 
 
