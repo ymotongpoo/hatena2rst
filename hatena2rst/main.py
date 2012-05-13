@@ -52,8 +52,11 @@ def parse_day(day):
     date = day.attrib['date']
     title = day.attrib['title']
     body = day.xpath("./body")[0]
-    header = ":%s: %s\n\n" % (day, title)
-    return (day, header + parse_body(body))
+    if title:
+        header = ":%s: %s\n\n" % (day, title)
+        return (day, header + parse_body(body))
+    else:
+        return (day, parse_body(body))
 
 
 """
