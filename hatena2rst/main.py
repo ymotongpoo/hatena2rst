@@ -13,14 +13,11 @@ import sys
 from datetime import datetime
 
 if sys.version_info[0] == 2:
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
+    from StringIO import StringIO
 else:
     from io import StringIO
 
-from constants import codec, indent, image_extensions, filetype_map
+from constants import codec, indent, status_flag, image_extensions, filetype_map
 
 
 """
@@ -28,12 +25,13 @@ main process
 """
 def main(filename):
     with open(filename, 'rb') as f:
-        data = StringIO(f.read().decode(codec))
-        tree = etree.parse(data, etree.XMLParser())
+        data = StringIO(f.read())
+        tree = etree.parse(data, etree.XMLParser(recover=True))
         results = parse_hatena_xml(tree)
         for day, data in results:
-            fp = open(day, 'wp')
-            fp.write(data)
+            day_file = day.encode(codec) + ".rst"
+            fp = open(day_file, 'wb+')
+            fp.write(data.encode(codec))
             fp.close()
 
 
@@ -54,9 +52,9 @@ def parse_day(day):
     body = day.xpath("./body")[0]
     if title:
         header = ":%s: %s\n\n" % (day, title)
-        return (day, header + parse_body(body))
+        return (date, header + parse_body(body))
     else:
-        return (day, parse_body(body))
+        return (date, parse_body(body))
 
 
 """
@@ -142,6 +140,8 @@ def parse_body(body):
                     status = status_flag["IN_SUPERPRE"]
             else:
                 result.append(l)
+
+    result = [ convert_inlines(l) for l in result ]
     return '\n'.join(result)
 
 
@@ -196,7 +196,6 @@ def convert_quote(block, site):
         link = convert_link(site)
         quote_msg = "(sited from %s)" % link
         quoted.append(quote_msg)
-    print(quoted)
     return '\n'.join(quoted) + '\n'
 
 
@@ -220,6 +219,17 @@ convert in-line notations
   - id notation (id:user:20120512, etc)
   - fotolive notation ([f:id:user:20120512094500:image], etc)
 """
+
+def convert_inlines(line):
+    line = convert_section(line)
+    line = convert_chapter(line)
+
+    line = convert_link(line)
+    line = convert_list(line)
+    line = convert_fotolife(line)
+    line = convert_id(line)
+    return line
+
 
 # chapter notation
 #  - http://goo.gl/CDXtj
@@ -245,7 +255,7 @@ def convert_chapter(line):
 # section notation
 #  - http://goo.gl/eZTQu
 section_notation = re.compile("""
-\A\s*(?P<notation>\*{2,3})\s*(?P<title>.*)
+\A(?P<notation>\*{2,3})\s*(?P<title>.*)
 """, re.VERBOSE)
 
 def convert_section(line):
@@ -265,7 +275,7 @@ def convert_section(line):
 #  - http://goo.gl/m8cS
 hyperlink_notation = re.compile("""
 \[
-(?P<url>(https?|ftp)://[\S].+?)
+(?P<url>(https?|ftp)://[\w\-\#\?\+\^\:\.\*\.&$@!=/]+?)
 (:title=?(?P<title>.+?))?
 (?P<bookmark>:bookmark)?
 (?P<image>:image)?
@@ -291,13 +301,13 @@ def convert_link(line):
         if url and title:
             converted = " `%s <%s>`_ " % (title, url)
         elif url and not title:
+            print((url, title))
             converted = " `%s`_ " % (url,)
         elif image:
             if url[-3] in image_extensions:
                 converted = ""
         target = target.replace(notation, converted)
-
-    return target.strip()
+    return target
 
 # list notation
 #  - http://goo.gl/UpXR7
@@ -431,14 +441,18 @@ def convert_fotolife(line):
     return target
 
 
-if __name__ == '__main__':
+def command():
     from argparse import ArgumentParser
 
     prog = "hatena2rst"
     description = "Hatena diary XML to reST converter"
-    argparse = ArgumentParser(prog=prog, description=description)
+    parser = ArgumentParser(prog=prog, description=description)
 
     parser.add_argument("filename", type=str)
-    args = vars(parser.parse_args())
+    args = parser.parse_args()
 
     main(args.filename)
+
+
+if __name__ == '__main__':
+    command()

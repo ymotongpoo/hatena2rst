@@ -56,7 +56,7 @@ setup(
     packages=['hatena2rst'],
     package_data={},
     entry_points=dict(
-        console_scripts=["hatena2rst = main:main"]
+        console_scripts=["hatena2rst = hatena2rst:command"]
         ),
     extras_require = dict(
         test=[

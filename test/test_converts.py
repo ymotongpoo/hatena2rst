@@ -82,35 +82,35 @@ convert_link()
 """
 def test_normal_link():
     link = convert_link("[http://www.example.com]")
-    assert "`http://www.example.com`_" == link
+    assert " `http://www.example.com`_ " == link
 
 def test_link_with_title():
     link = convert_link("[http://www.example.com:title]")
-    assert "`http://www.example.com`_" == link
+    assert " `http://www.example.com`_ " == link
 
 def test_link_with_title():
     link = convert_link("[http://www.example.com:title=test]")
-    assert "`test <http://www.example.com>`_" == link
+    assert " `test <http://www.example.com>`_ " == link
 
 def test_link_with_bookmark():
     link = convert_link("[http://www.example.com:bookmark]")
-    assert "`http://www.example.com`_" == link
+    assert " `http://www.example.com`_ " == link
 
 def test_link_with_title_and_bookmark():
     link = convert_link("[http://www.example.com:title=test:bookmark]")
-    assert "`test <http://www.example.com>`_" == link
+    assert " `test <http://www.example.com>`_ " == link
     
 def test_link_with_multibyte_title():
     link = convert_link("[http://www.spam.com:title=テストタイトル:bookmark]")
-    assert "`テストタイトル <http://www.spam.com>`_" == link
+    assert " `テストタイトル <http://www.spam.com>`_ " == link
 
 def test_link_with_port():
     link = convert_link("[http://www.example.com:8080/?spam=egg&ham=spam]")
-    assert "`http://www.example.com:8080/?spam=egg&ham=spam`_" == link
+    assert " `http://www.example.com:8080/?spam=egg&ham=spam`_ " == link
 
 def test_link_with_port_and_title():
     link = convert_link("[http://www.example.com:8080/?spam=egg:title=ほげ]")
-    assert "`ほげ <http://www.example.com:8080/?spam=egg>`_" == link
+    assert " `ほげ <http://www.example.com:8080/?spam=egg>`_ " == link
 
 def test_link_in_sentence():
     link = convert_link("詳しくは[http://spam.com:title=ここ]を見て下さい")
