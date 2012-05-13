@@ -5,6 +5,12 @@ indent = "   "
 max_depth = 3
 image_extensions = ['png', 'PNG, ''jpeg', 'JPEG', 'jpg', 'JPG', 'gif', 'GIF']
 
+status_flag = {
+    "NORMAL":         1 << 0,
+    "IN_QUOTE":       1 << 1,
+    "IN_SUPERPRE":    1 << 2,
+}
+
 """
 lexer mapping between hatena and pygments
   - hatena supre pre: http://goo.gl/xtQWf

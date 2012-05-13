@@ -30,27 +30,31 @@ def main(filename):
     with open(filename, 'rb') as f:
         data = StringIO(f.read().decode(codec))
         tree = etree.parse(data, etree.XMLParser())
-        parse_hatena_xml(tree)
+        results = parse_hatena_xml(tree)
+        for day, data in results:
+            fp = open(day, 'wp')
+            fp.write(data)
+            fp.close()
+
 
 def parse_hatena_xml(tree):
     """
     parse element tree of Hatena diary archived XML tree
     """
-    pass
+    days = tree.xpath("//day")
+    return [parse_day(d) for d in days]
 
 
 def parse_day(day):
     """
     parse <day> tag
     """
-    pass
+    date = day.attrib['date']
+    title = day.attrib['title']
+    body = day.xpath("./body")[0]
+    header = ":%s: %s\n\n" % (day, title)
+    return (day, header + parse_body(body))
 
-
-def parse_body(body):
-    """
-    parse <body> tag
-    """
-    pass
 
 """
 utility functions
@@ -91,6 +95,52 @@ quote_sp_end_notation = re.compile("""
 (?P<quote><<)|(?P<sp>\|\|<)
 \Z
 """, re.VERBOSE)
+
+def parse_body(body):
+    """
+    parse <body> tag
+    """
+    text = body.text
+    lines = text.split("\n")
+
+    result = []
+    buffer, content, status, depth = [], {}, status_flag["NORMAL"], 0
+
+    for l in lines:
+        if status & status_flag["IN_QUOTE"]:
+            end = quote_sp_end_notation.search(l)
+            if end and depth == 0:
+                ret = convert_quote(buffer, content['site'])
+                result.extend(ret.split('\n'))
+                buffer, content, status = [], {}, status_flag["NORMAL"]
+                continue
+            elif end and depth > 0:
+                depth -= 1
+            elif quote_sp_start_notation.search(l):
+                depth += 1
+            buffer.append(l)
+
+        elif status & status_flag["IN_SUPERPRE"]:
+            end = quote_sp_end_notation.search(l)
+            if end:
+                ret = convert_super_pre(buffer, content['filetype'])
+                result.extend(ret.split('\n'))
+                buffer, content, status = [], {}, status_flag["NORMAL"]
+                continue
+            buffer.append(l)
+
+        else:
+            start = quote_sp_start_notation.search(l)
+            if start:
+                content = start.groupdict()
+                if content['quote']:
+                    status = status_flag["IN_QUOTE"]
+                elif content['sp']:
+                    status = status_flag["IN_SUPERPRE"]
+            else:
+                result.append(l)
+    return '\n'.join(result)
+
 
 def convert_quote(block, site):
     """
