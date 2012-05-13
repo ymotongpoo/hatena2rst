@@ -4,6 +4,20 @@ from __future__ import unicode_literals
 from hatena2rst import *
 
 """
+convert_super_pre()
+"""
+def test_super_pre():
+    depth = 0
+    block = ["import sys", "print(sys.version)"]
+    filetype = "python"
+    converted_block = convert_super_pre(depth, block, filetype)
+    assert (".. code-block:: python\n" +
+            "\n" +
+            "   import sys\n" +
+            "   print(sys.version)") == converted_block
+    
+
+"""
 convert_chapter()
 """
 def test_chapter_normal():

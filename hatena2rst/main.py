@@ -83,9 +83,9 @@ def convert_super_pre(depth, block, filetype):
     """
     convert super pre notation into code-block directive
     """
-    indented_block = [ indent*depth + l for l in block ]
-    pass
-    
+    indented_block = [ indent*(depth+1) + l for l in block ]
+    directive = [".. code-block:: %s\n" % filetype_map.get(filetype, "none")]
+    return "\n".join(directive + indented_block)
 
 
 """
