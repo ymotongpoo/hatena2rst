@@ -2,6 +2,7 @@
 
 codec = "utf-8"
 indent = "   "
+max_depth = 3
 image_extensions = ['png', 'PNG, ''jpeg', 'JPEG', 'jpg', 'JPG', 'gif', 'GIF']
 
 """
@@ -41,6 +42,7 @@ filetype_map = {
     "scheme": "scheme",
     "sh": "bash",
     "sql": "sql",
+    "tcsh": "tcsh",
     "tex": "tex",
     "xml": "xml",
     "yaml": "yaml",

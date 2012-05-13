@@ -6,15 +6,34 @@ from hatena2rst import *
 """
 convert_super_pre()
 """
+def test_quote():
+    block = ["spam", "egg", "ham"]
+    converted_block = convert_quote(block, None)
+    assert "   spam\n\n   egg\n\n   ham\n\n" == converted_block
+
+def test_nested_quote():
+    block = ["spam", ">>", "egg", "ham", "<<", "foo"]
+    converted_block = convert_quote(block, None)
+    assert "   spam\n\n      egg\n\n      ham\n\n   foo\n\n" == converted_block
+
+def test_nested_super_pre():
+    block = ["spam", ">|python|", "import sys",
+             "print(sys.version)", "||<", "egg"]
+    converted_block = convert_quote(block, None)
+    assert ("   spam\n\n" +
+            "   .. code-block:: python\n\n" + 
+            "      import sys\n" +
+            "      print(sys.version)\n\n" +
+            "   egg\n\n") == converted_block
+
 def test_super_pre():
-    depth = 0
     block = ["import sys", "print(sys.version)"]
     filetype = "python"
-    converted_block = convert_super_pre(depth, block, filetype)
+    converted_block = convert_super_pre(block, filetype)
     assert (".. code-block:: python\n" +
             "\n" +
             "   import sys\n" +
-            "   print(sys.version)") == converted_block
+            "   print(sys.version)\n") == converted_block
     
 
 """

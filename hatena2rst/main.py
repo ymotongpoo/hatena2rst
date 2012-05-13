@@ -71,21 +71,92 @@ def string_width(string):
 
 """
 convert multi-line notations
-  - quate notation (>>..<<)
+  - quote notation (>>..<<)
   - pre notation (>|..|<)
   - super pre notation (>||..||<)
 """
 
+
+# quote notation
+#  - http://goo.gl/HunQj
+quote_sp_start_notation = re.compile("""
+\A
+(?P<quote>>(?P<site>(https?|ftp)://\S+)?>)|
+(?P<sp>>\|(?P<filetype>\w+)?\|)
+\Z
+""", re.VERBOSE)
+
+quote_sp_end_notation = re.compile("""
+\A
+(?P<quote><<)|(?P<sp>\|\|<)
+\Z
+""", re.VERBOSE)
+
+def convert_quote(block, site):
+    """
+    convert quote notation
+    
+    TODO: find better algorithm for indenting block correctly.
+    In reST paragraph requies blanked new line, and as of now
+    'adjusted' list and following for loop handles that.
+    """
+    quoted = []
+    buffer = []
+    in_nest = False
+    content = {}
+    for l in block:
+        if not in_nest:
+            start = quote_sp_start_notation.search(l)
+            if start:
+                content = start.groupdict()
+                in_nest = True
+            else:
+                quoted.append(indent + l)
+                quoted.append('')
+        else:
+            end = quote_sp_end_notation.search(l)
+            if end:
+                if content['quote']:
+                    if content['site']:
+                        link_notation = content['site']
+                    else:
+                        link_notation = ""
+                    lines = convert_quote(buffer, link_notation)
+                    # find better algorithm
+                    adjusted = [indent + l for l in lines.split("\n")[:-1]
+                                if len(l.strip()) > 0]
+                    for l in adjusted:
+                        quoted.append(l)
+                        quoted.append('')
+
+                elif content['sp']:
+                    lines = convert_super_pre(buffer, content['filetype'])
+                    quoted.extend([indent + l for l in lines.split("\n")])
+
+                in_nest = False
+                buffer = []
+                content = {}
+            else:
+                buffer.append(l)
+
+    if site:
+        link = convert_link(site)
+        quote_msg = "(sited from %s)" % link
+        quoted.append(quote_msg)
+    print(quoted)
+    return '\n'.join(quoted) + '\n'
+
+
 # super pre notatino
 #  - http://goo.gl/Q2szA
 #  - http://goo.gl/xtQWf
-def convert_super_pre(depth, block, filetype):
+def convert_super_pre(block, filetype):
     """
     convert super pre notation into code-block directive
     """
-    indented_block = [ indent*(depth+1) + l for l in block ]
+    indented_block = [ indent + l for l in block ]
     directive = [".. code-block:: %s\n" % filetype_map.get(filetype, "none")]
-    return "\n".join(directive + indented_block)
+    return "\n".join(directive + indented_block) + "\n"
 
 
 """
@@ -225,7 +296,6 @@ def convert_id(line):
             converted += "%s" % content['option']
             if content['amonth'] and content['option'] == 'archive':
                 converted += "/%s" % content['amonth']
-        print((converted, notation))
         converted = "`%s <%s>`_" % (notation, converted)
         target = target.replace(notation, converted)
 
